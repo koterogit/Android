@@ -25,6 +25,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
+import java.time.LocalDateTime;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -41,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
-                new FTPUpload().execute(touch("test.txt"),"LOG/test.txt");
+                new FTPUpload().execute(touch(Environment.getExternalStorageDirectory()+"/LOG","test.txt"),"LOG/test.txt");
             }
         });
     }
@@ -95,21 +96,20 @@ public class MainActivity extends AppCompatActivity {
         //       }
     }
 
-    public String touch(String name){
+    public String touch(String path, String name){
         // <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
         // <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-        String root = Environment.getExternalStorageDirectory() + "/LOG";
         try {
-            File dir = new File(root);
+            File dir = new File(path);
             if (!dir.exists()) dir.mkdir();
             FileWriter writer = new FileWriter(new File(dir, name));
-            writer.append("test");
+            writer.append("test:"+ LocalDateTime.now());
             writer.flush();
             writer.close();
         } catch (IOException e){
             e.printStackTrace();
         }
-        return root + "/"+name;
+        return path + "/"+name;
     }
 
     private class FTPUpload extends AsyncTask <String, Void, Long>{
