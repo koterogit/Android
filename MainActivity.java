@@ -72,6 +72,44 @@ public class MainActivity extends AppCompatActivity {
     //-------------------------------------
     // TEST CODE
     //-------------------------------------
+
+    public boolean checkPermission(final String[] permissions) {
+        //  Call this function at onCreate, like below
+        //  onCreate(){
+        //        if(!checkPermission(permissions)) {
+        //            ActivityCompat.requestPermissions(this, permissions, REQUEST_CODE);
+        //        }
+        //  }
+        for (String permission : permissions) {
+            if(ContextCompat.checkSelfPermission(this, permission) != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    String[] permissions = {
+            Manifest.permission.INTERNET,
+            Manifest.permission.ACCESS_NETWORK_STATE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+            Manifest.permission.READ_EXTERNAL_STORAGE
+    };
+
+    private int REQUEST_CODE = 1000;
+
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode == REQUEST_CODE) {
+            for (int i = 0; i < permissions.length; i++) {
+                if (grantResults[i] != PackageManager.PERMISSION_GRANTED) {
+                    Toast toast = Toast.makeText(this, "パーミッションを有効にしてください。\r\n " + "[ " + permissions[i] + " ]", Toast.LENGTH_SHORT);
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    toast.show();
+                    this.finish();
+                }
+            }
+        }
+    }
+
     public void logcat(){
         // <uses-permission android:name="android.permission.READ_LOGS" />
 
@@ -112,8 +150,8 @@ public class MainActivity extends AppCompatActivity {
         return path + "/"+name;
     }
 
-    private class FTPUpload extends AsyncTask <String, Void, Long>{
-
+    private class FTPUpload extends AsyncTask<String, Void, Long> {
+        //new FTPUpload().execute(touch(Environment.getExternalStorageDirectory()+"/LOG","test.txt"), "test.txt");
         String TAG = "FTPTask";
         @Override
         protected Long doInBackground(String... paths) {
@@ -126,7 +164,7 @@ public class MainActivity extends AppCompatActivity {
             FTPClient client = new FTPClient();
             FileInputStream fis = null;
             try{
-                String server = "172.22.2.60";
+                String server = "192.168.2.101";
                 int port = 2121;
                 client.connect(server,port);
                 Log.d(TAG, String.format("connect: %d",client.getReplyCode()));
@@ -158,5 +196,4 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
     }
-
 }
